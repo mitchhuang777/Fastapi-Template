@@ -15,7 +15,7 @@ class TaskID(Enum):
     DB_DELETE = 103             # 刪除資料
     DB_QUERY = 104              # 查詢資料
 
-    # FastAPI 相關任務 (201 ~ 299)
+    # FastAPI 相關任務 (200 ~ 299)
     FASTAPI_STARTUP = 200       # FastAPI 服務啟動
     FASTAPI_REQUEST = 201       # FastAPI 處理請求
     FASTAPI_SHUTDOWN = 202      # FastAPI 服務關閉
