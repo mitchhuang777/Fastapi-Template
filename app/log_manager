@@ -67,7 +67,7 @@ class LogManager:
         self.console_handler.setLevel(logging.INFO)
 
 
-    def log(self, level: str = "info", worker: str = "N/A", task_id: str = "N/A", process_time: str = "N/A", status: int = 200, method: str = "N/A", router: str = "N/A", params=None, message: str = None):
+    def log(self, level: str = "info", worker: str = "N/A", task_id: str = "N/A", process_id: str = "N/A", process_time: str = "N/A", status: str = "N/A", method: str = "N/A", router: str = "N/A", params=None, message: str = None):
         """
         打印結構化日誌到控制台，並記錄到日誌文件。
         :param level: 日誌級別（如 "success", "failure", "warning", "info", "debug"）。
@@ -90,7 +90,7 @@ class LogManager:
                 except (TypeError, ValueError):
                     formatted_params = str(params)
 
-            process_id = str(uuid.uuid4())[:8]
+            process_id = str(uuid.uuid4())[:8] if process_id == "N/A" else process_id
 
             # 構建 extra 字段，用於 logger 格式化輸出
             extra = {
