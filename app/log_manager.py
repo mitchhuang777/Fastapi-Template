@@ -9,6 +9,19 @@ from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
 
 init(autoreset=True)
 
+# 定義自訂級別數值（介於 INFO 和 WARNING 之間）
+SUCCESS_LEVEL_NUM = 25
+
+# 註冊自訂級別名稱
+logging.addLevelName(SUCCESS_LEVEL_NUM, "SUCCESS")
+
+# 為 Logger 類別新增 success 方法
+def success(self, message, *args, **kwargs):
+    if self.isEnabledFor(SUCCESS_LEVEL_NUM):
+        self._log(SUCCESS_LEVEL_NUM, message, args, **kwargs)
+
+logging.Logger.success = success
+
 class LogManager:
     _instance = None
     _lock = RLock()
@@ -112,7 +125,17 @@ class LogManager:
             print(f"{color}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | {level.upper()} | {worker} | {task_id} | {process_id} | {process_time} | {status} | {method} | {router} | {formatted_params} | {message}{Style.RESET_ALL}")
 
             # 設置日誌級別並記錄
-            log_level = getattr(logging, level.upper(), None)
-            if log_level is None:
-                log_level = logging.INFO
-            self.logger.log(log_level, message, extra=extra)
+            level = level.lower()
+            if level == "success":
+                self.logger.success(message, extra=extra)
+            elif level == "error":
+                self.logger.error(message, extra=extra)
+            elif level == "warning":
+                self.logger.warning(message, extra=extra)
+            elif level == "info":
+                self.logger.info(message, extra=extra)
+            elif level == "debug":
+                self.logger.debug(message, extra=extra)
+            else:
+                self.logger.info(message, extra=extra)
+
