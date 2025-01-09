@@ -19,3 +19,4 @@ class TaskID(Enum):
     FASTAPI_STARTUP = 200       # FastAPI 服務啟動
     FASTAPI_REQUEST = 201       # FastAPI 處理請求
     FASTAPI_SHUTDOWN = 202      # FastAPI 服務關閉
+    FASTAPI_ERROR = 203         # FastAPI 錯誤處理
