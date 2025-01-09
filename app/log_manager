@@ -1,0 +1,102 @@
+import logging
+import uuid
+from datetime import datetime
+from threading import RLock
+from colorama import Fore, Style, init
+import json
+
+init(autoreset=True)
+
+class LogManager:
+    _instance = None
+    _lock = RLock()
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:  # 雙重檢查鎖定，確保只有一個實例
+                    cls._instance = super(LogManager, cls).__new__(cls)
+                    cls._instance.__initialized = False
+        return cls._instance
+
+    def __init__(self, log_file: str = "server.log"):
+        if self.__initialized:
+            return  # 如果已初始化過，直接返回
+        self.__initialized = True
+
+        self.level_colors = {
+            "success": Fore.GREEN,
+            "failure": Fore.RED,
+            "warning": Fore.YELLOW,
+            "info": Fore.WHITE,
+            "debug": Fore.CYAN,
+            "prompt": Fore.MAGENTA,
+        }
+        
+        log_format = (
+            "%(asctime)s | %(levelname)s | %(worker)s | %(task_id)s | "
+            "%(process_id)s | %(process_time)s | %(status)s | %(method)s | "
+            "%(router)s | %(params)s | %(log_message)s"
+        )
+        
+        # 初始化 logger
+        self.logger = logging.getLogger("LogManager")
+        self.logger.setLevel(logging.INFO)
+
+        # 文件處理器，純文字格式
+        file_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
+        file_handler.setLevel(logging.INFO)
+        file_handler.setFormatter(logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S"))
+
+        # 添加文件處理器到 logger
+        self.logger.addHandler(file_handler)
+
+    def log(self, level: str = "info", worker: str = "N/A", task_id: str = "N/A", process_time: str = "N/A", status: int = 200, method: str = "N/A", router: str = "N/A", params=None, message: str = None):
+        """
+        打印結構化日誌到控制台，並記錄到日誌文件。
+        :param level: 日誌級別（如 "success", "failure", "warning", "info", "debug"）。
+        :param worker: Worker 名稱（默認為 "N/A"）。
+        :param task_id: 任務 ID（默認為 "N/A"）。
+        :param process_time: 任務處理時間（默認為 "N/A"）。
+        :param status: HTTP 狀態碼（默認為 200）。
+        :param method: 調用的方法名稱（默認為 "N/A"）。
+        :param router: 調用的 API 路由（默認為 "N/A"）。
+        :param params: 任務參數（默認為 None）。
+        :param message: 任務訊息（默認為 None）。
+        """
+        with self._lock:
+            # 處理 params
+            if params is None:
+                formatted_params = "None"
+            else:
+                try:
+                    formatted_params = json.dumps(params, ensure_ascii=False, separators=(",", ":"))
+                except (TypeError, ValueError):
+                    formatted_params = str(params)
+
+            process_id = str(uuid.uuid4())[:8]
+
+            # 構建 extra 字段，用於 logger 格式化輸出
+            extra = {
+                "worker": worker,
+                "task_id": task_id,
+                "process_id": process_id,
+                "process_time": process_time,
+                "status": status,
+                "method": method,
+                "router": router,
+                "params": formatted_params,
+                "log_message": message
+            }
+
+            # 顏色映射
+            color = self.level_colors.get(level.lower(), Fore.WHITE)
+
+            # 控制台顯示帶顏色的訊息
+            print(f"{color}{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | {level.upper()} | {worker} | {task_id} | {process_id} | {process_time} | {status} | {method} | {router} | {formatted_params} | {message}{Style.RESET_ALL}")
+
+            # 設置日誌級別並記錄
+            log_level = getattr(logging, level.upper(), None)
+            if log_level is None:
+                log_level = logging.INFO
+            self.logger.log(log_level, message, extra=extra)
