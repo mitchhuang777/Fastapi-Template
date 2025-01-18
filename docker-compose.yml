@@ -3,7 +3,7 @@ services:
     build:
       context: .       # Dockerfile 的位置（專案根目錄）
       dockerfile: Dockerfile
-    container_name: tstockx-app
+    container_name: fastapi-template-app
     ports:
       - "8000:8000"    # 映射容器內的 8000 埠到本機
     environment:
@@ -16,27 +16,27 @@ services:
     volumes:
       - ./app/logs:/app/logs # 持久化日誌
     networks:
-      - tstockx-net
+      - fastapi-template-net
 
   db:
     image: mariadb:10.5   # 使用官方 MariaDB 映像，兼容 MySQL
-    container_name: tstockx-db
+    container_name: fastapi-template-db
     ports:
       - "0.0.0.0:3306:3306"    # 映射容器內的 3306 埠到本機
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword # MySQL 的 root 密碼
-      MYSQL_DATABASE: t_stockx_db       # 自動創建的資料庫
-      MYSQL_USER: tstockx_user          # 資料庫用戶
+      MYSQL_DATABASE: fastapi-template_db       # 自動創建的資料庫
+      MYSQL_USER: fastapi-template_user          # 資料庫用戶
       MYSQL_PASSWORD: password          # 資料庫用戶的密碼
       TZ: Asia/Taipei                   # 設置時區
     volumes:
       - db_data:/var/lib/mysql          # 持久化 MySQL 數據
     networks:
-      - tstockx-net
+      - fastapi-template-net
 
 volumes:
   db_data: # 用於持久化 MySQL 數據
   app_logs: # 用於持久化 app 日誌
 
 networks:
-  tstockx-net: # 服務之間的自定義網路
+  fastapi-template-net: # 服務之間的自定義網路
