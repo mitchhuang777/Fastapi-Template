@@ -41,11 +41,10 @@ class LogManager:
 
         self.level_colors = {
             "success": Fore.GREEN,
-            "failure": Fore.RED,
+            "error": Fore.RED,
             "warning": Fore.YELLOW,
             "info": Fore.WHITE,
             "debug": Fore.CYAN,
-            "prompt": Fore.MAGENTA,
         }
         
         log_format = (
