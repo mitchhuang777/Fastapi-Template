@@ -20,3 +20,14 @@ class TaskID(Enum):
     FASTAPI_REQUEST = 201       # FastAPI 處理請求
     FASTAPI_SHUTDOWN = 202      # FastAPI 服務關閉
     FASTAPI_ERROR = 203         # FastAPI 錯誤處理
+
+    # 資料抓取相關任務 (301 ~ 399)
+    FETCH_STOCK_DATA = 301        # 抓取股票資訊
+    FETCH_EXCHANGE_RATE = 302     # 抓取匯率資訊
+    FETCH_ERROR = 303     # 處理抓取錯誤  
+
+    # 排程相關任務 (401 ~ 499)
+    SCHEDULE_TASK = 401         # 排程任務
+    SCHEDULE_ERROR = 402        # 排程錯誤
+
+    
